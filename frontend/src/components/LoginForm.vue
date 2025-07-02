@@ -1,35 +1,65 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100 px-4">
-    <div class="w-full max-w-md bg-white shadow-lg rounded-lg p-8 space-y-6">
-      <h2 class="text-3xl font-bold text-center text-blue-700">Login</h2>
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="login-title">Login</h2>
 
-      <form @submit.prevent="" class="space-y-4">
-        <input
-          v-model="email"
-          type="email"
-          placeholder="Email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="Password"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        />
-        <button
-          type="submit"
-          class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
-        >
-          Login  test
-        </button>
+      <form @submit.prevent="handleLogin">
+        <div>
+          <label class="login-label">Email</label>
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Enter your email"
+            class="login-input"
+            required
+          />
+        </div>
+        <div>
+          <label class="login-label">Password</label>
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Enter your password"
+            class="login-input"
+            required
+          />
+        </div>
+        <button type="submit" class="login-button">Login</button>
       </form>
 
-      <p class="text-center text-sm text-gray-600">
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+      <p class="login-footer">
         Don't have an account?
-        <router-link to="/register" class="text-blue-600 hover:underline">Register</router-link>
+        <router-link to="/register">Register</router-link>
       </p>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { auth } from '../firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+
+const handleLogin = async () => {
+  errorMessage.value = ''
+  try {
+    const result = await signInWithEmailAndPassword(auth, email.value, password.value)
+    console.log('Logged in:', result.user)
+    window.location.href = '/tasks'
+  } catch (err: any) {
+    if (err.code === 'auth/user-not-found') {
+      errorMessage.value = 'User not found. Please register first.'
+    } else if (err.code === 'auth/wrong-password') {
+      errorMessage.value = 'Incorrect password.'
+    } else {
+      errorMessage.value = err.message
+    }
+  }
+}
+</script>
