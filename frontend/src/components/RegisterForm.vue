@@ -51,11 +51,14 @@
 import { ref } from 'vue'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase'
+import { syncUser } from '../services/userService'
+import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
+const router = useRouter()
 
 const handleRegister = async () => {
   errorMessage.value = ''
@@ -66,9 +69,12 @@ const handleRegister = async () => {
   }
 
   try {
+    
     const result = await createUserWithEmailAndPassword(auth, email.value, password.value)
     console.log('Registered:', result.user)
-    window.location.href = '/tasks'
+    await syncUser(result.user)
+     router.push('/tasks') 
+
   } catch (err: any) {
     if (err.code === 'auth/email-already-in-use') {
       errorMessage.value = 'This email is already registered.'

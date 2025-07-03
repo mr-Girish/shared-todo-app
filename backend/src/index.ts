@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import dotenv from 'dotenv'
 import db from '../src/db/db'
 import userRoutes from './routes/userRoute'
+import cors from '@fastify/cors' 
 
 
 dotenv.config()
@@ -11,6 +12,12 @@ dotenv.config()
 
 const app = Fastify()
 
+
+//cors
+ app.register(cors, {
+  origin: 'http://localhost:5174', 
+  credentials: true
+})
 
 app.register(userRoutes)
 
