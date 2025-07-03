@@ -1,6 +1,9 @@
 import { FastifyInstance } from 'fastify'
-import { syncUser } from '../controllers/syncUser'
+import { getAllUsers, syncUser } from '../controllers/syncUser'
 
 export default async function userRoutes(app: FastifyInstance) {
   app.post('/sync-user', syncUser)
+   app.get('/get-all-users', getAllUsers)
 }
+
+

@@ -13,3 +13,15 @@ export const createTaskApi = async (task: { title: string; description: string; 
   const response = await axios.post(`${API_BASE}/create-task`, task)
   return response.data
 }
+
+
+export const shareTaskApi = async (task_id: string, user_ids: string[]) => {
+  const response = await axios.post(`${API_BASE}/share-task`,{ task_id, user_ids });
+    return response.data  
+};
+
+
+export const getUnsharedUsers = async (taskId: string) => {
+  const res = await axios.get(`${API_BASE}/unshared-users/${taskId}`);
+  return await res.data;
+};

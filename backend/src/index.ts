@@ -4,6 +4,7 @@ import db from '../src/db/db'
 import userRoutes from './routes/userRoute'
 import cors from '@fastify/cors' 
 import taskRoutes from './routes/tasksRoutes'
+import shareTaskRoute from './routes/shareRoutes'
 
 
 dotenv.config()
@@ -22,6 +23,7 @@ const app = Fastify()
 
 app.register(userRoutes)
 app.register(taskRoutes)
+app.register(shareTaskRoute)
 
 
 const port = process.env.PORT || 4001

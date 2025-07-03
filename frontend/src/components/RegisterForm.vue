@@ -5,6 +5,17 @@
 
       <form @submit.prevent="handleRegister">
         <div>
+          <label class="login-label">Full Name</label>
+          <input
+  v-model="fullName"
+  type="text"
+  placeholder="Full Name"
+  class="login-input"
+  required
+/>
+
+        </div>
+        <div>
           <label class="login-label">Email</label>
           <input
             v-model="email"
@@ -48,41 +59,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../firebase'
-import { syncUser } from '../services/userService'
-import { useRouter } from 'vue-router'
+import { ref } from "vue";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
+import { syncUser } from "../services/userService";
+import { useRouter } from "vue-router";
 
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const errorMessage = ref('')
-const router = useRouter()
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const errorMessage = ref("");
+const fullName = ref("");
+
+const router = useRouter();
 
 const handleRegister = async () => {
-  errorMessage.value = ''
+  errorMessage.value = "";
 
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = "Passwords do not match"
-    return
+    errorMessage.value = "Passwords do not match";
+    return;
   }
 
   try {
-    
-    const result = await createUserWithEmailAndPassword(auth, email.value, password.value)
-    console.log('Registered:', result.user)
-    await syncUser(result.user)
-     router.push('/tasks') 
+    const result = await createUserWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value
+    );
+    console.log("Registered:", result.user);
+      await updateProfile(result.user, {
+      displayName: fullName.value,
+    });
 
+    await syncUser(result.user);
+    router.push("/tasks");
   } catch (err: any) {
-    if (err.code === 'auth/email-already-in-use') {
-      errorMessage.value = 'This email is already registered.'
-    } else if (err.code === 'auth/weak-password') {
-      errorMessage.value = 'Password should be at least 6 characters.'
+    if (err.code === "auth/email-already-in-use") {
+      errorMessage.value = "This email is already registered.";
+    } else if (err.code === "auth/weak-password") {
+      errorMessage.value = "Password should be at least 6 characters.";
     } else {
-      errorMessage.value = err.message
+      errorMessage.value = err.message;
     }
   }
-}
+};
 </script>

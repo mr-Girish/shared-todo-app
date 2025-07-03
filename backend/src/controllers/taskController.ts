@@ -40,34 +40,47 @@ export const createTask = async (req: FastifyRequest, reply: FastifyReply) => {
 }
 
 export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { filter, user_id } = req.query as {
-    filter?: "shared";
+  const { filter = 'all', user_id } = req.query as {
+    filter?: 'all' | 'my' | 'shared';
     user_id?: string;
   };
 
   const client = (req.server as FastifyInstance & { pg: Client }).pg;
 
   try {
-    let query = "SELECT * FROM tasks";
-    let params: any[] = [];
+    let query = `
+      SELECT 
+        t.id,
+        t.title,
+        t.description,
+        t.owner_id,
+        t.created_at,
+        COALESCE(
+          json_agg(
+            json_build_object('id', u.id, 'full_name', u.full_name, 'email', u.email)
+          ) FILTER (WHERE u.id IS NOT NULL),
+          '[]'
+        ) AS shared_users
+      FROM tasks t
+      LEFT JOIN shared_tasks st ON t.id = st.task_id
+      LEFT JOIN users u ON st.user_id = u.id
+    `;
+    const params: any[] = [];
 
-    if (filter === "shared" && user_id) {
-      query = `
-        SELECT t.*
-        FROM tasks t
-        JOIN tasks ta ON t.id = ta.task_id
-        WHERE ta.user_id = $1
-      `;
-      params = [user_id];
-    } else if (user_id && !filter) {
-      query = "SELECT * FROM tasks WHERE owner_id = $1";
-      params = [user_id];
+    if (filter === 'my' && user_id) {
+      query += ' WHERE t.owner_id = (SELECT id FROM users WHERE firebase_uid = $1)';
+      params.push(user_id);
+    } else if (filter === 'shared' && user_id) {
+      query += ' WHERE t.id IN (SELECT task_id FROM shared_tasks WHERE user_id = (SELECT id FROM users WHERE firebase_uid = $1))';
+      params.push(user_id);
     }
+
+    query += ' GROUP BY t.id ORDER BY t.created_at DESC';
 
     const result = await client.query(query, params);
     reply.send(result.rows);
   } catch (err) {
-    console.error(err);
-    reply.status(500).send({ error: "Error fetching tasks", detail: err });
+    reply.status(500).send({ error: 'Error fetching tasks', detail: err });
   }
 };
+

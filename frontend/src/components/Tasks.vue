@@ -32,6 +32,8 @@
             <th>ID</th>
             <th>Title</th>
             <th>Owner</th>
+            <th>Shared Users</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -39,10 +41,25 @@
             <td>{{ task.id }}</td>
             <td>{{ task.title }}</td>
             <td>{{ task.owner_id }}</td>
+            <td>
+              <ul v-if="task.shared_users && task.shared_users.length">
+                <li v-for="user in task.shared_users" :key="user.id">{{ user.full_name }}</li>
+              </ul>
+              <span v-else>-</span>
+            </td>
+            <td>
+              <button class="share-button" @click="openShareModal(task)">Share</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <ShareTaskModal
+      v-if="showModal"
+      :taskId="selectedTaskId"
+      @close="showModal = false"
+    />
   </div>
 </template>
 
@@ -51,6 +68,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuth, signOut } from 'firebase/auth'
 import { fetchTasksByFilter, createTaskApi } from '../services/taskService'
+import ShareTaskModal from '../components/ShareTaskModal.vue'
 
 const router = useRouter()
 const auth = getAuth()
@@ -58,6 +76,9 @@ const auth = getAuth()
 const tasks = ref<any[]>([])
 const newTask = ref('')
 const filter = ref<'all' | 'my' | 'shared'>('all')
+
+const showModal = ref(false)
+const selectedTaskId = ref<string | null>(null)
 
 const logout = async () => {
   await signOut(auth)
@@ -91,6 +112,11 @@ const addTask = async () => {
   } catch (error) {
     console.error('Error adding task:', error)
   }
+}
+
+const openShareModal = (task: any) => {
+  selectedTaskId.value = task.id
+  showModal.value = true
 }
 
 onMounted(() => {

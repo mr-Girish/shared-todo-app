@@ -18,14 +18,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { fetchAllTasks } from '../services/taskService'
+import { fetchTasksByFilter } from '../services/taskService'
 
 const tasks = ref<any[]>([])
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const result = await fetchAllTasks()
+    const result = await fetchTasksByFilter('all')
     tasks.value = result
   } catch (err) {
     console.error('Failed to fetch tasks', err)
