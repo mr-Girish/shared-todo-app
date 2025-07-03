@@ -1,0 +1,22 @@
+Table users {
+  id uuid [pk, default: 'uuid_generate_v4()']
+  firebase_uid varchar [unique, not null]
+  email varchar [unique, not null]
+  full_name varchar
+  created_at timestamp [default: 'now()']
+}
+
+Table tasks {
+  id uuid [pk, default: 'uuid_generate_v4()']
+  title varchar
+  description text
+  owner_id uuid [ref: > users.id]
+  created_at timestamp [default: 'now()']
+}
+
+Table shared_task {
+  id uuid [pk, default: 'uuid_generate_v4()']
+  task_id uuid [ref: > tasks.id]
+  user_id uuid [ref: > users.id]
+  assigned_at timestamp [default: 'now()']
+}
