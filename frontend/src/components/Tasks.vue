@@ -65,7 +65,7 @@
     </div>
 
     <ShareTaskModal
-      v-if="showModal"
+      v-if="showModal && selectedTaskId"
       :taskId="selectedTaskId"
       @close="showModal = false"
       @shared="handleShared"

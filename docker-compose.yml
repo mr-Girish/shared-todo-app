@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    environment:
+     - VITE_FIREBASE_API_KEY=AIzaSyAFuHnx7Zy_ZX9zavI0bPgEmakpqcuhXlY
+     - VITE_FIREBASE_AUTH_DOMAIN=shared-todo-app-cedc4.firebaseapp.com
+     - VITE_FIREBASE_PROJECT_ID=shared-todo-app-cedc4
+     - VITE_FIREBASE_STORAGE_BUCKET=shared-todo-app-cedc4.firebasestorage.app
+     - VITE_FIREBASE_MESSAGING_SENDER_ID=1019679093156
+     - VITE_FIREBASE_APP_ID=1:1019679093156:web:219d5af5420f1b6cee9131
+     - VITE_FIREBASE_MEASUREMENT_ID=G-1KGZ3KGD79
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:Changeme%40123@db.vupfzwmvbozdsokdrkfw.supabase.co:5432/postgres
+      - NODE_ENV=development
+    # depends_on:
+    #   - db
+
+  # Optional local DB service if needed
+  # db:
+  #   image: postgres:15
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: shared_todo
+  #   ports:
+  #     - "5433:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
