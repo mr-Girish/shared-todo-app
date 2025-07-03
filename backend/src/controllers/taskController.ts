@@ -2,30 +2,42 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { Client } from "pg";
 
 export const createTask = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { title, description, owner_id } = req.body as {
-    title: string;
-    description: string;
-    owner_id: string;
-  };
+  const { title, description, firebase_uid } = req.body as {
+    title: string
+    description: string
+    firebase_uid: string
+  }
 
-  const client = (req.server as FastifyInstance & { pg: Client }).pg;
+  const client = (req.server as FastifyInstance & { pg: Client }).pg
 
   try {
+    const userResult = await client.query(
+      'SELECT id FROM users WHERE firebase_uid = $1',
+      [firebase_uid]
+    )
+
+    if (userResult.rows.length === 0) {
+      return reply.status(404).send({ error: 'User not found for this Firebase ID' })
+    }
+
+    const owner_id = userResult.rows[0].id
+
+    // 2. Create task
     const result = await client.query(
-      `INSERT INTO tasks (title, description, owner_id)
-       VALUES ($1, $2, $3) RETURNING *`,
+      `INSERT INTO tasks (title, description, owner_id, created_at)
+       VALUES ($1, $2, $3, NOW()) RETURNING *`,
       [title, description, owner_id]
-    );
+    )
 
     reply.code(201).send({
-      message: "Task created successfully",
+      message: 'Task created successfully',
       task: result.rows[0],
-    });
+    })
   } catch (error) {
-    console.error(error);
-    reply.status(500).send({ error: "Error creating task", detail: error });
+    console.error(error)
+    reply.status(500).send({ error: 'Error creating task', detail: error })
   }
-};
+}
 
 export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
   const { filter, user_id } = req.query as {
@@ -43,7 +55,7 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
       query = `
         SELECT t.*
         FROM tasks t
-        JOIN task_assignees ta ON t.id = ta.task_id
+        JOIN tasks ta ON t.id = ta.task_id
         WHERE ta.user_id = $1
       `;
       params = [user_id];

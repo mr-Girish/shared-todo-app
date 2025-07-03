@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import db from '../src/db/db'
 import userRoutes from './routes/userRoute'
 import cors from '@fastify/cors' 
+import taskRoutes from './routes/tasksRoutes'
 
 
 dotenv.config()
@@ -20,6 +21,8 @@ const app = Fastify()
 })
 
 app.register(userRoutes)
+app.register(taskRoutes)
+
 
 const port = process.env.PORT || 4001
 
