@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import dotenv from 'dotenv'
 import db from '../src/db/db'
+import userRoutes from './routes/userRoute'
 
 
 dotenv.config()
@@ -11,6 +12,7 @@ dotenv.config()
 const app = Fastify()
 
 
+app.register(userRoutes)
 
 const port = process.env.PORT || 4001
 
