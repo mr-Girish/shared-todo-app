@@ -41,7 +41,7 @@ export const createTask = async (req: FastifyRequest, reply: FastifyReply) => {
 
 export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
   const { filter = 'all', user_id } = req.query as {
-    filter?: 'all' | 'my' | 'shared';
+    filter?: 'all' | 'self' | 'shared';
     user_id?: string;
   };
 
@@ -74,13 +74,12 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
 
     const params: any[] = [];
 
-    if (filter === 'my' && user_id) {
+    if (filter === 'self' && user_id) {
       query += ' WHERE t.owner_id = (SELECT id FROM users WHERE firebase_uid = $1)';
       params.push(user_id);
-    } else if (filter === 'shared' && user_id) {
-      query += ' WHERE t.id IN (SELECT task_id FROM shared_tasks WHERE user_id = (SELECT id FROM users WHERE firebase_uid = $1))';
-      params.push(user_id);
-    }
+    }  else if (filter === 'shared') {
+  query += ' WHERE st.user_id IS NOT NULL';
+}
 
     query += ' GROUP BY t.id, owner.id ORDER BY t.created_at DESC';
 

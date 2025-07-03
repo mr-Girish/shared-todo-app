@@ -10,7 +10,7 @@
         <h2 class="task-subtitle">Your Tasks</h2>
         <select v-model="filter" class="task-filter" @change="fetchTasks">
           <option value="all">All Tasks</option>
-          <option value="my">My Tasks</option>
+          <option value="self">My Tasks</option>
           <option value="shared">Shared Tasks</option>
         </select>
         <button class="create-task-button" @click="openCreateModal">Create Task</button>
@@ -93,7 +93,7 @@ const toast = useToast();
 
 const tasks = ref<any[]>([]);
 const newTask = ref("");
-const filter = ref<"all" | "my" | "shared">("all");
+const filter = ref<"all" | "self" | "shared">("all");
 
 const showModal = ref(false);
 const selectedTaskId = ref<string | null>(null);
