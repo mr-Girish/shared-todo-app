@@ -19,15 +19,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getUnsharedUsers } from '../services/taskService'
-import { shareTaskApi } from '../services/taskService'
+import { getUnsharedUsers, shareTaskApi } from '../services/taskService'
 
 const props = defineProps<{
   taskId: string
 }>()
 
-const emit = defineEmits(['close'])
-
+const emit = defineEmits(['close', 'shared']) 
 const users = ref<any[]>([])
 const selectedUsers = ref<string[]>([])
 
@@ -44,7 +42,7 @@ const shareTask = async () => {
     await shareTaskApi(props.taskId, selectedUsers.value)
     alert('Task shared successfully!')
     selectedUsers.value = []
-    emit('close')
+    emit('shared') 
   } catch (err) {
     console.error('Error sharing task:', err)
   }

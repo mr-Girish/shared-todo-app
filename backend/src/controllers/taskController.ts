@@ -55,6 +55,11 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
         t.description,
         t.owner_id,
         t.created_at,
+        json_build_object(
+          'id', owner.id,
+          'full_name', owner.full_name,
+          'email', owner.email
+        ) AS owner,
         COALESCE(
           json_agg(
             json_build_object('id', u.id, 'full_name', u.full_name, 'email', u.email)
@@ -62,9 +67,11 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
           '[]'
         ) AS shared_users
       FROM tasks t
+      LEFT JOIN users owner ON t.owner_id = owner.id
       LEFT JOIN shared_tasks st ON t.id = st.task_id
       LEFT JOIN users u ON st.user_id = u.id
     `;
+
     const params: any[] = [];
 
     if (filter === 'my' && user_id) {
@@ -75,7 +82,7 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
       params.push(user_id);
     }
 
-    query += ' GROUP BY t.id ORDER BY t.created_at DESC';
+    query += ' GROUP BY t.id, owner.id ORDER BY t.created_at DESC';
 
     const result = await client.query(query, params);
     reply.send(result.rows);
