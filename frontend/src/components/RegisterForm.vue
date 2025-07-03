@@ -64,6 +64,8 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { syncUser } from "../services/userService";
 import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+import { useUserStore } from "../stores/user";
 
 const email = ref("");
 const password = ref("");
@@ -72,12 +74,16 @@ const errorMessage = ref("");
 const fullName = ref("");
 
 const router = useRouter();
+const toast = useToast();
+const userStore = useUserStore()
+
 
 const handleRegister = async () => {
   errorMessage.value = "";
 
   if (password.value !== confirmPassword.value) {
     errorMessage.value = "Passwords do not match";
+    toast.error(errorMessage.value);
     return;
   }
 
@@ -87,12 +93,17 @@ const handleRegister = async () => {
       email.value,
       password.value
     );
-    console.log("Registered:", result.user);
-      await updateProfile(result.user, {
+
+    await updateProfile(result.user, {
       displayName: fullName.value,
     });
 
-    await syncUser(result.user);
+    const dbUser = await syncUser(result.user);
+    userStore.setFirebaseUser(result.user)
+    userStore.setDbUser(dbUser)
+    const displayName = userStore.firebaseUser?.displayName || 'User'
+
+    toast.success(`Registration successful! Welcome ${displayName}!`);
     router.push("/tasks");
   } catch (err: any) {
     if (err.code === "auth/email-already-in-use") {
@@ -102,6 +113,9 @@ const handleRegister = async () => {
     } else {
       errorMessage.value = err.message;
     }
+
+    toast.error(errorMessage.value);
   }
 };
 </script>
+

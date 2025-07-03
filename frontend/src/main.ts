@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './routers'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import { createPinia } from 'pinia'
 
 
 //toast configuratio for the vue 
@@ -22,6 +23,9 @@ const options = {
 }
 
 const app = createApp(App)
+
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
 app.use(Toast, options)
 app.mount('#app')

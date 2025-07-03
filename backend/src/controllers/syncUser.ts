@@ -2,10 +2,10 @@ import { FastifyReply, FastifyRequest, FastifyInstance } from "fastify";
 import { Client } from "pg";
 
 export const syncUser = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { firebase_uid, email,displayName } = req.body as {
+  const { firebase_uid, email, displayName } = req.body as {
     firebase_uid: string;
     email: string;
-    displayName:string
+    displayName: string;
   };
   const client = (req.server as FastifyInstance & { pg: Client }).pg;
 
@@ -20,12 +20,15 @@ export const syncUser = async (req: FastifyRequest, reply: FastifyReply) => {
     }
 
     // Insert new user (UUID will be auto-generated)
-    await client.query(
+    const insertResult = await client.query(
       "INSERT INTO users (firebase_uid, email,full_name, created_at) VALUES ($1, $2, $3, NOW())",
-      [firebase_uid, email,displayName]
+      [firebase_uid, email, displayName]
     );
 
-    reply.send({ message: "User synced successfully" });
+    reply.send({
+      message: "User synced successfully",
+      user: insertResult.rows[0],
+    });
   } catch (err) {
     console.error(err);
     reply.status(500).send({ error: "Error syncing user", detail: err });

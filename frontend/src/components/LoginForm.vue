@@ -39,26 +39,39 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { auth } from '../firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useToast } from 'vue-toastification'
+import { useUserStore } from '../stores/user'
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
+const toast = useToast()
+const router = useRouter()
+const userStore = useUserStore()
 
 const handleLogin = async () => {
   errorMessage.value = ''
   try {
     const result = await signInWithEmailAndPassword(auth, email.value, password.value)
     console.log('Logged in:', result.user)
-    window.location.href = '/tasks'
+    userStore.setFirebaseUser(result.user)
+    const displayName = userStore.firebaseUser?.displayName || 'User'
+    toast.success(`Welcome back, ${displayName}!`)
+
+    router.push('/tasks')
   } catch (err: any) {
     if (err.code === 'auth/user-not-found') {
       errorMessage.value = 'User not found. Please register first.'
+      toast.error(errorMessage.value)
     } else if (err.code === 'auth/wrong-password') {
       errorMessage.value = 'Incorrect password.'
+      toast.error(errorMessage.value)
     } else {
       errorMessage.value = err.message
+      toast.error('Login failed.')
     }
   }
 }

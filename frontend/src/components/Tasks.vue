@@ -26,30 +26,33 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(task, index) in tasks" :key="task.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ task.title }}</td>
-            <td>{{ task.owner.full_name }}</td>
-            <td>
-              <ul v-if="task.shared_users?.length">
-                <li v-for="user in task.shared_users" :key="user.id">
-                  {{ user.full_name }}
-                </li>
-              </ul>
-              <span v-else>-</span>
-            </td>
-            <td>
-              <button class="action-button" @click="openShareModal(task)">Share</button>
-              <button class="action-button" @click="startEdit(task)">Edit</button>
-              <button class="action-button delete" @click="deleteTask(task.id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
+      <tbody>
+  <tr v-if="tasks.length === 0">
+    <td colspan="5" style="text-align: center; padding: 1rem;">No tasks found.</td>
+  </tr>
+  <tr v-for="(task, index) in tasks" :key="task.id" v-else>
+    <td>{{ index + 1 }}</td>
+    <td>{{ task.title }}</td>
+    <td>{{ task.owner.full_name }}</td>
+    <td>
+      <ul v-if="task.shared_users?.length">
+        <li v-for="user in task.shared_users" :key="user.id">
+          {{ user.full_name }}
+        </li>
+      </ul>
+      <span v-else>-</span>
+    </td>
+    <td>
+      <button class="action-button" @click="openShareModal(task)">Share</button>
+      <button class="action-button" @click="startEdit(task)">Edit</button>
+      <button class="action-button delete" @click="deleteTask(task.id)">Delete</button>
+    </td>
+  </tr>
+</tbody>
+
       </table>
     </div>
 
-    <!-- Modal -->
     <div v-if="showTaskModal" class="modal-overlay">
       <div class="modal-content">
         <TaskForm
