@@ -18,7 +18,8 @@ const app = Fastify()
 //cors
  app.register(cors, {
   origin: 'http://localhost:5174', 
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 })
 
 app.register(userRoutes)

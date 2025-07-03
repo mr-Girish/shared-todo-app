@@ -84,3 +84,43 @@ export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
   }
 };
 
+
+
+export const deleteTask = async (req: FastifyRequest, reply: FastifyReply) => {
+  const { id } = req.params as { id: string }
+  const client = (req.server as FastifyInstance & { pg: Client }).pg
+
+  try {
+    await client.query('BEGIN')
+
+    await client.query('DELETE FROM shared_tasks WHERE task_id = $1', [id])
+    await client.query('DELETE FROM tasks WHERE id = $1', [id])
+
+    await client.query('COMMIT')
+
+    reply.send({ message: 'Task deleted successfully' })
+  } catch (err) {
+    await client.query('ROLLBACK')
+    reply.status(500).send({ error: 'Error deleting task', detail: err })
+  }
+}
+
+
+
+export const updateTask = async (req: FastifyRequest, reply: FastifyReply) => {
+  const { id } = req.params as { id: string }
+  const { title, description } = req.body as { title: string; description: string }
+
+  const client = (req.server as FastifyInstance & { pg: Client }).pg
+
+  try {
+    await client.query(
+      'UPDATE tasks SET title = $1, description = $2 WHERE id = $3',
+      [title, description, id]
+    )
+    reply.send({ message: 'Task updated successfully' })
+  } catch (err) {
+    reply.status(500).send({ error: 'Error updating task', detail: err })
+  }
+}
+

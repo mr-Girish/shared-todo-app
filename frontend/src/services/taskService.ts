@@ -25,3 +25,22 @@ export const getUnsharedUsers = async (taskId: string) => {
   const res = await axios.get(`${API_BASE}/unshared-users/${taskId}`);
   return await res.data;
 };
+
+
+
+
+export const deleteTaskApi = async (taskId: string) => {
+  const res = await axios.delete(`${API_BASE}/delete-task/${taskId}`);
+  return await res.data;
+};
+
+
+
+
+export const updateTaskApi = async (taskId: string, title: string) => {
+  const res = await axios.put(`${API_BASE}/edit-task/${taskId}`, {
+    title,
+    description: '' 
+  });
+  return res.data;
+};
