@@ -1,9 +1,15 @@
-# Use Node for development server (no Nginx)
-FROM node:20-alpine
+# Dockerfile (frontend/Dockerfile)
+FROM node:20-slim
 
 WORKDIR /app
+
 COPY . .
 
-RUN npm install
+# Fix the optional dependency issue
+RUN npm install --omit=optional
+
+# Expose the Vite dev port
 EXPOSE 5173
+
+# Run dev server
 CMD ["npm", "run", "dev"]

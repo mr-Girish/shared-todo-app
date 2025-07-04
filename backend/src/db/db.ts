@@ -16,6 +16,7 @@ async function dbConnector(fastify: FastifyInstance) {
     console.log("Connected to Supabase Postgres");
   } catch (err) {
     fastify.log.error("Failed to connect to DB", err);
+    throw err;
   }
 }
 
