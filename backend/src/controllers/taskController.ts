@@ -40,6 +40,7 @@ export const createTask = async (req: FastifyRequest, reply: FastifyReply) => {
 }
 
 export const getTasks = async (req: FastifyRequest, reply: FastifyReply) => {
+   console.log("📥 /tasks-list endpoint hit");
   const { filter = 'all', user_id } = req.query as {
     filter?: 'all' | 'self' | 'shared';
     user_id?: string;

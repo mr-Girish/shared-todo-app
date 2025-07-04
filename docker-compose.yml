@@ -7,41 +7,23 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
+      - ./frontend:/node_modules
     environment:
-     - VITE_FIREBASE_API_KEY=AIzaSyAFuHnx7Zy_ZX9zavI0bPgEmakpqcuhXlY
-     - VITE_FIREBASE_AUTH_DOMAIN=shared-todo-app-cedc4.firebaseapp.com
-     - VITE_FIREBASE_PROJECT_ID=shared-todo-app-cedc4
-     - VITE_FIREBASE_STORAGE_BUCKET=shared-todo-app-cedc4.firebasestorage.app
-     - VITE_FIREBASE_MESSAGING_SENDER_ID=1019679093156
-     - VITE_FIREBASE_APP_ID=1:1019679093156:web:219d5af5420f1b6cee9131
-     - VITE_FIREBASE_MEASUREMENT_ID=G-1KGZ3KGD79
+     - VITE_FIREBASE_API_KEY=your_firebase_api_key
+     - VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+     - VITE_FIREBASE_PROJECT_ID=your_project_id
+     - VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+     - VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+     - VITE_FIREBASE_APP_ID=your_app_id
+     - VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
   backend:
     build:
       context: ./backend
     ports:
-      - "3000:3000"
+      - "4001:4001"
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:Changeme%40123@db.vupfzwmvbozdsokdrkfw.supabase.co:5432/postgres
+      - DATABASE_URL=postgresql://postgres.vupfzwmvbozdsokdrkfw:[YOUR-PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:6543/postgres
       - NODE_ENV=development
-    # depends_on:
-    #   - db
-
-  # Optional local DB service if needed
-  # db:
-  #   image: postgres:15
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: shared_todo
-  #   ports:
-  #     - "5433:5432"
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
