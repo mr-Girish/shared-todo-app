@@ -33,6 +33,9 @@ shared-todo-app/
 │   │   └── main.ts
 │   └── .env                # Environment file
 ├── README.md
+├──Dockerfile
+
+
 ```
 
 ---
