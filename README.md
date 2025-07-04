@@ -20,16 +20,19 @@ shared-todo-app/
 │   ├── schema.dbml
 │   ├── schema.sql
 │   └── index.ts
+|   └── .env (your environment file)
 ├── frontend/               # Vue 3 + Firebase + Pinia
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
+│   │   ├── rpouters/
 │   │   ├── services/
 │   │   ├── stores/
 │   │   ├── firebase.ts
 │   │   └── main.ts
+|    └── .env (your environment file)
 ├── README.md
-└── .env (your environment file)
+
 ```
 
 ---
@@ -59,6 +62,7 @@ cd shared-todo-app
    ```
    PORT=4001
    DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<dbname>
+   
    ```
 
 4. Start the development server:
