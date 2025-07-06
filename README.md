@@ -7,7 +7,7 @@ This is a full-stack **Shared Todo List App** built using:
 - **Backend**: Node.js (Fastify) + PostgreSQL (Supabase)  
 - **Database Modeling**: DBML → SQL  
 - **Authentication**: Firebase  
-- **Containerization**: Docker *(currently not working on this system)*
+- **Containerization**: Docker 
 
 ---
 
